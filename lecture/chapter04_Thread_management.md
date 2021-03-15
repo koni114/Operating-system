@@ -76,14 +76,34 @@ v               |
 - 사용자 영역의 스레드 라이브러리로 구현됨
   - 스레드의 생성, 스케줄링 등
   - POSIX threads, Win32 threads, Java thread API 등
+- 커널은 스레드의 존재를 모름
+  - 커널의 관리를 받지 않음
+    - 생성 및 부하가 적음. 유연한 관리 가능
+    - 이식성(portability)이 높음
+- 커널은 프로세스 단위로 자원 할당
+  - 하나의 스레드가 block 상태가되면 모든 스레드가 대기상태로 들어감
 
+![img](https://github.com/koni114/Operating-system/blob/master/img/os_9.JPG)
 
+### 커널 수준 스레드
+- OS(kernel)가 직접 관리
+- 커널 영역에서 스레드의 생성, 관리 수행 
+  - Context switching등 관리 부하가 큼
+- 커널이 각 스레드를 개별적으로 관리
+  - 프로세스 내 스레드들이 병행 수행 가능
+    - 하나의 스레드가 block 상태가 되어도, 다른 스레드는 계속 작업 수행 가능
 
+![img](https://github.com/koni114/Operating-system/blob/master/img/os_10.JPG)
 
+### Multi-threading Model
+- 사용자 수준 스레드 + 커널 수준 스레드를 복합적으로 사용하는 모델
+- 다대다(n:m) 모델
+- n개의 사용자 수준 스레드와 m개의 커널 수준 스레드(n >= m)
+  - 사용자는 원하는 수만 큼 스레드 사용
+  - 커널 스레드는 자신에게 할당된 하나의 사용자 스레드가 block 상태가 되어도, 다른 스레드 수행 가능
+- 효율적이면서도 유연함
 
-
-
-
+![img](https://github.com/koni114/Operating-system/blob/master/img/os_11.JPG)
 
 
 
