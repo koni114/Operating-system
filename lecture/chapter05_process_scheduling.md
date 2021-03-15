@@ -25,7 +25,7 @@
     - 주어진 시간(Tc)동안 자원이 활용된 시간(Tr)  
     - Utilization = Tr / Tc
     - 비싼 장비를 구매한 경우
-- 목적에 맞는 지표를 고려하여 스케줄링 기법을 선택
+- 목적에 맞는 지표를 고려하여 스케줄링 기법을 선택해야 함
 
 ## 대기시간, 응답시간, 반환시간
 ![img](https://github.com/koni114/Operating-system/blob/master/img/os_12.JPG)
@@ -70,6 +70,7 @@
 - 메모리 할당 결정(memory allocation)
 - ready - suspended ready state 관계에서 어떤 것을 우선적으로 memory에 올려줄지를 결정하는 것이 mid-term scheduling임
 - Job scheduling보다는 더 자주 빈번히 일어남
+
 
 ## short-term scheduling
 - process scheduling
@@ -122,3 +123,5 @@
 - 프로세스 상태 변화에 따라 priority 변경
 - 구현이 복잡하고, priority overhead가 큼
 - 시스템 환경 변화에 유연한 대응 가능 
+
+### TEST
