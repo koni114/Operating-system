@@ -20,7 +20,7 @@
     - interactive system, real-time에서 중요한 지표가 될 것임
   - 작업 처리량(throughout)
     - 단위 시간동안 처리한 작업 수
-    - batch system
+    - batch systems
   - 자원 활용도
     - 주어진 시간(Tc)동안 자원이 활용된 시간(Tr)  
     - Utilization = Tr / Tc
