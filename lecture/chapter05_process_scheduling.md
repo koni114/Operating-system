@@ -25,7 +25,7 @@
     - 주어진 시간(Tc)동안 자원이 활용된 시간(Tr)  
     - Utilization = Tr / Tc
     - 비싼 장비를 구매한 경우
-- 목적에 맞는 지표를 고려하여 스케줄링 기법을 선택해야 함
+- 목적에 맞는 지표를 고려하여 스케줄링 기법을 선택해야 합니다
 
 ## 대기시간, 응답시간, 반환시간
 ![img](https://github.com/koni114/Operating-system/blob/master/img/os_12.JPG)
