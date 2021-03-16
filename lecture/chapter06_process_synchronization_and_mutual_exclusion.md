@@ -80,7 +80,7 @@
 - 이러한 코드는 위의 3가지 고려사항을 만족할까?   
   NO! while문을 통과하고 preemption이 발생하고 반대편에서 들어오면 ME에 위배됨
 
-![img](https://github.com/koni114/Operating-system/blob/master/img/os_18.JPG) 
+![img](https://github.com/koni114/Operating-system/blob/master/img/os_19.JPG) 
 
 - version 2와 다른 점은 먼저 내가 들어갈 것이다! 라고 flag를 주고 while문이 시작되는데,  
   이렇게 되면 Bounded waiting 문제에 위배
@@ -102,11 +102,71 @@
 - Two process ME를 보장하는 알고리즘
 ![img](https://github.com/koni114/Operating-system/blob/master/img/os_20.JPG) 
 
+~~~c
+flag[0] <- false;
+flag[1] <- false;
+turn <- 0; 
+
+// P0
+flag[0] <- true;          // 자신의 깃발을 먼저 듬
+while(flag[1]) do         // 만약 상대편이 깃발을 먼저 들었다면. while문으로 들어감
+  if(turn = 1) then       // turn --> 1이면, P1이 들어가 있다는 것이므로, flag 내리고 대기
+    begin                 
+      flag[0] <- false;
+      while(turn = 1) do  // trun --> 0이 될때까지 대기. 바뀌면 flag 올리고 CS로 들어감
+      endwhile;
+      flag[0] <- true;
+    end;
+endwhile;
+[Critical Section]
+turn <- 1;
+flag[0] <- false;
+
+// P1
+flag[1] <- true;
+while(flag[0]) do
+  if(turn = 0) then
+    begin
+      flag[1] <- false;
+      while(trun = 0) do 
+      endwhile;
+      flag[1] <- true;
+    end;
+endwhile;
+[Critical Section]
+turn <- 0;
+flag[1] <- false;
+~~~
+
 ## SW solutions - Peterson's algorithm
 - Dekker 보다 더 간단한 알고리즘
 - 핵심은 깃발을 들고 서로 먼저 들어가라고 양보하는 코드를 추가
 
+~~~c
+flag[0] <- false;
+flag[1] <- false;
+turn <- 0;
+
+// P0
+flag[0] <- true;
+turn <- 1; // P1에게 양보
+while(flag[1] and turn = 1) do
+endwhile;
+[Critical Section]
+flag[0] <- false; 
+
+// P1
+flag[1] <- true;
+turn <- 0; // P0에게 양보
+while(flag[0] and turn = 0) do
+endwhile;
+[Critical Section]
+flag[1] <- false;
+~~~
+
+
 ![img](https://github.com/koni114/Operating-system/blob/master/img/os_21.JPG) 
+
 
 ## SW solutions - N-preocess Mutual Exclusion
 
@@ -123,9 +183,28 @@
 
 ![img](https://github.com/koni114/Operating-system/blob/master/img/os_22.JPG)
 
+~~~c
+/* 임계 지역 진입시도 1단계  */
+flag[i] <- want-in;
+while(turn != i) do // 내 턴이 아니면,
+  if (flag[turn] = idle) then // CS에 들어가있는 process가 idle이 될 때 까지 기다림
+    turn <- i;                // 만약 CS에서 나왔다면, 내 턴으로 바꾸고 2단계 진입
+endwhile;
+/* 임계 지역 진입시도 2단계  */
+flag[i] <- in-CS;
+j <- 0
+// in-CS라는 공간에서 나혼자만 존재할 경우 CS로 들어감.
+while((j < n) and (j = i or flag[j] != in-CS)) do
+  j <- j + 1;
+endwhile;
+until(j >= n); // j를 n번 까지 검사하여 아무도 없다면 CS 진입
+[Critical Section]
+flag[i] <- idle;
+~~~
+
 ## SW Solutions들의 문제점
 - 속도가 느림  
-- 구현이 복잡한  
+- 구현이 복잡  
 - ME primitive 실행 중 preemption 될 수 있음  
   - 공유 데이터 수정 중은 interrupt를 억제 함으로써 해결 가능  
 - Busy waiting
@@ -169,6 +248,7 @@ do // process P(i)의 진입 영역
         key = TestAndSet(&lock);
     waiting[i] = false;
         // 임계 영역
+        [Critical Section]
         // 탈출 영역
     j = (i + 1) % n
     while((j != i) && !waiting[j]) // 대기 중인 프로세스를 찾음
@@ -188,9 +268,12 @@ do // process P(i)의 진입 영역
 
 ## OS supported SW solution
 ## Spinlock 
+- 만약 다른 스레드나 프로세스가 lock을 소유하고 있다면, 그 lock이 반환될 때까지 계속 확인하며 기다리는 것
+- 조금만 기다리면 바로 쓸 수 있는데 굳이 context switching으로 부하를 줄 필요가 있나? 라는 아이디어에서 출발
+- Lock, Unlock하는 과정이 짧은 경우에 유용
 - S는 정수 변수. 특정한 instant 값을 할당할 수 있는 것이 아닌, P(), V()로만 연산 가능
 - 초기화, P(), V() 연산으로만 접근 가능
-  - 위 연산들은 indivisible(or atomic) 연산. 즉 P(), V() 연산을 preemption을 보장
+  - 위 연산들은 indivisible(or atomic) 연산. 즉 <b>P(), V() 연산이 preemption하다는 것을 보장</b>
     - OS support 보장
     - 전체가 한 instruction cycle에 반드시 수행 됨
 - S는 물건이라고 생각
@@ -207,16 +290,20 @@ V(S){
     S <- S + 1;
 }
 ~~~
-
+- 다음의 예시는 두 프로세스 간의 스핀락 예제(스레드가 아님을 유의)
 ![img](https://github.com/koni114/Operating-system/blob/master/img/os_24.JPG)
 - `active` 라는 spinlock 변수가 있다고 생각
 - P, V는 preemption이 보장되기 때문에 ME가 쉽게 해결됨
 - 그러면, SW Solution으로 왜 이렇게 어렵게 푸느냐? 라고 할 수 있지만, 이러한 과정들이 있었기 때문에  
   쉽게 풀 수 있는 과정들을 찾아 낼 수 있게 됨
 - <b>spinlock은 문제가 하나 있는데, 멀티 프로세서인 경우에만 사용 가능</b>  
-  why? 두 process는 하나의 CPU에서 동시에 수행되어야 하는데, 그렇게 될 수 없음(둘 다 일을 못함)  
+  why? 두 process는 하나의 CPU에서 동시에 수행되어야 하는데, 그렇게 될 수 없음(둘 다 일을 못함)
+- 일반적으로 컴퓨터에서(예를 들어 멀티 프로세서) 100개의 메모장이라는 프로세스를 동시에 실행시킬 수 있는 이유는  
+  OS가 매우 빠르게 교체하면서 프로세스를 실행하기 때문
+- 또한 현재 P연산과 V연산이 중간의 인터럽트 없이 one-cycle로 실행되도록 OS가 보장하기 때문에 P연산과 V연산을 수행 중에는 동시에 다른 프로세스가 한 프로세서에서 실행될 수 없음 
 - busy waiting  
-  - 여전히 while문에서 계속 수행되는 문제가 발생
+  - 여전히 while문에서 계속 수행되는 문제가 발생 
+
 
 ## Semaphore
 - Busy waiting 문제를 해결할 수 있는 Semaphore를 알아보자
@@ -240,7 +327,7 @@ V(S){
 P(S){
     if(S > 0){
         then S <- S - 1;
-        els- e wait on the queue Q(s); // 물건이 없을 때는 ready queue에 들어가서 기다림. block된 상태
+        else wait on the queue Q(s); // 물건이 없을 때는 ready queue에 들어가서 기다림. block된 상태
     }
 }
 
@@ -291,7 +378,7 @@ V(S){
 
 ![img](https://github.com/koni114/Operating-system/blob/master/img/os_27.JPG)
 
-- producer processs는 드라이버, 컴파일러, 어셈블러 등의 무언가의 데이터를 생산하려는 녀석들이고, Consumer process는 라인 프린터, 어셈블러, 로더처럼 실제 데이터를 소비하여 행동하는 녀석들임
+- producer process는 드라이버, 컴파일러, 어셈블러 등의 무언가의 데이터를 생산하려는 녀석들이고, Consumer process는 라인 프린터, 어셈블러, 로더처럼 실제 데이터를 소비하여 행동하는 녀석들임
 - 이 때 buffer에 producer가 생성한 녀석들을 담게 되는데, 물건을 놓는 동안에 가져가면 안되고, 물건을 두는 동안에 또 다른 녀석이 물건을 두는 행위가 일어나서는 안됨. 즉 동기화가 필요
 - 먼저 간단하게 single buffer 부터 풀어보자!
 
@@ -312,20 +399,22 @@ V(S){
   - 소비가 되었으면(consumed) V() 수행
 
 ### N-buffers Producer-consumer problem
+- circular queue를 이용하여 문제 해결 가능
+- 삽입 위치의 포인터(In), 제거 위치의 포인터(Out)
 ![img](https://github.com/koni114/Operating-system/blob/master/img/os_29.JPG) 
 - circular queue를 사용하여 물건을 놓는 지점(in), 물건을 가져가는 지점(out)이 있음을 기억하자
 
 ![img](https://github.com/koni114/Operating-system/blob/master/img/os_30.JPG)
 - mutexP, mutexC --> 생산자, 소비자 process가 한번에 한명만 쓰라는 의미의 변수
 - CS는 Producer 같은 경우는 P(nrempty) - V(nrfull) 구간이 되며, Consumer는 P(nrfull) - V(nrempty)가 됨
-- nrfull --> buffer에 차 있는 수데ㅇ
+- nrfull --> buffer에 차 있는 수
   nrempty --> buffer에 비어 있는 수  
   nrfull + nrempty = 물건의 수(N)      
 - Producer
   - 공간이 있는지 확인(P(nrempty)) 
   - 공간이 없으면 공간이 생길때 까지 queue에 대기
   - 공간이 있으면 물건을 buffer에 두고(buffer[in] <- M)
-  - 어디에 물건을 두면 되는지 다음 위치를 update(in <- (in + 1 % mod N))  
+  - 어디에 물건을 두면 되는지 다음 위치를 update(in <- ((in + 1) % mod N))  
   - 나오면서 물건 수 하나 늘려주고 나오면 됨(V(nrfull))
 - Consumer
   - 물건이 있는지 확인(P(nrfull))
@@ -333,6 +422,34 @@ V(S){
   - 물건이 있으면 물건을 꺼내고(m <- buffer[out])
   - 물건 위치를 갱신해주고(out <- (out+1) % mod N)
   - 나오면서 공간 수 하나 늘려주고 나오면 됨(V(nrempty)) 
+
+~~~c
+nrfull = 0;  // buffer에 꽉차 있는 수
+nrempty = N; // buffer에 비어있는 수
+mutexP = 1;  // 동기화를 위하여 생산자가 동시에 수행하지 못하도록 하는 변수
+mutexC = 1;  // 동기화를 위하여 소비자가 동시에 수행하지 못하도록 하는 변수
+buffer = []  // message buffer
+in, out = 0,N-1; // message를 두는 지점과 가져가는 지점의 위치 인덱스
+
+// Producer Pi
+create a new message M;
+P(mutexP);
+P(nrempty);
+buffer[in] <- M;
+in <- (in + 1) mod N;
+v(nrfull);
+v(mutexP); 
+
+// Consumer Cj
+P(mutexC);
+P(nrfull);
+m <- buffer[out];
+out <- (out+1) mod N;
+V(nrempty);
+V(mutexC);
+~~~
+
+
 
 ### Reader-Writer Problem
 - Reader
@@ -352,6 +469,8 @@ V(S){
 - 이번 예제는 reader preference solution 예제를 semaphore로 해결해보자
 
 ### Redaer-Writer problem(reader preference solution)
+![img](https://github.com/koni114/Operating-system/blob/master/img/os_47.JPG)
+
 - Writer Wj
   - writer는 한명만 쓸 수 있기 때문에 간단함
 - Reader Ri
@@ -561,4 +680,4 @@ V(S){
 - 단점
   - 지원하는 언어에서만 사용 가능
   - 컴파일러가 OS를 이해하고 있어야 함
-    - Critical section 접근을 위한 코드 생성    
+    - Critical section 접근을 위한 코드 생성  
