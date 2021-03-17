@@ -464,7 +464,7 @@ V(mutexC);
 - 해결법
   - reader / writer에 대한 우선권 부여
     - reader preference solution  
-      --> 내가 읽고 있을 떄, writer와 다른 reader가 접근했을 때, reader에게 우선권이 주어지는 case      
+      --> 내가 읽고 있을 때, writer와 다른 reader가 접근했을 때, reader에게 우선권이 주어지는 case      
     - writer preference solution      
 - 이번 예제는 reader preference solution 예제를 semaphore로 해결해보자
 
@@ -481,7 +481,7 @@ V(mutexC);
   - 첫 단계는 읽으러 들어가기 전에 <b>사전 작업</b>을 수행
     - 사전 작업은 reader 중 한 명만 할 수 있음
     - 먼저 reader의 수를 check
-      - 0명이면 writer에 대한 mutax 수행(P(mutex))
+      - 0명이면 reader에게 우선권을 주기 위하여 writer에 대한 P연산 수행(P(wmutex))
       - 0보다 크다면 누군가 위의 작업을 수행했으므로, 작업할 필요 없음
       - nreaders에 1명 추가(nreaders <- nreaders + 1)
     - 사전 작업 검토를 여러명이 들어와서 수행하면 안되므로, CS로 구분 지음
