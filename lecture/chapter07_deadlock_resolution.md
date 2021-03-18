@@ -1,4 +1,4 @@
-# chapter07 교착상태(Deadlock Resoltion)
+# chapter07 교착상태(Deadlock Resolution)
 - 어느 프로세스도 어느 자원을 가져갈 수 없는 상태
 
 ## Deadlock의 개념
@@ -46,7 +46,7 @@
   - ex) Memory등
 
 ### 동시 사용 가능 여부에 따른 분류
-- Exclisive allocation resources
+- Exclusive allocation resources
   - 한 순간에 한 프로세스만 사용 가능한 자원
   - ex) processor, memory, disk drive 등
   - memory는 조각내서 사용할 순 있지만, 동일한 조각을 여러 프로세스가 공유할 수 없음
@@ -154,3 +154,228 @@
 - 4개의 deadlock 발생 필요 조건 중 하나를 제거
 - Deadlock이 절대 발생하지 않지만 심각한 자원 낭비가 발생
 - 비현실적임!
+
+## Deadlock Avoidance
+- 시스템의 상태를 계속 감시
+- 시스템이 deadlock 상태가 될 가능성이 있는 자원 할당 요청 보류  
+  --> 시스템을 항상 safe state로 유지
+- Safe state
+  - 모든 프로세스가 정상적 종료 가능한 상태
+  - Safe sequence가 존재하느냐로 판단 가능
+    - Deadlock 상태가 되지 않을 수 있음을 보장  
+- Unsafe state
+  - Deadlock 상태가 될 가능성이 있음
+  - 반드시 발생한다는 의미는 아님  
+- 가정(1~3 때문에 크게 현실적이지는 않음)
+  - 프로세스의 수가 고정됨
+  - 자원의 종류와 수가 고정됨
+  - 프로세스가 요구하는 자원 및 최대 수량을 알고 있음
+  - 프로세스는 자원을 사용 후 반드시 반납
+- Not practical    
+- Dijkstra's algorithm
+  - Banker's algorithm
+- Habermann's algorithm   
+
+### Dijkstra's banker's algorithm
+- 은행원 알고리즘. 
+- Deadlock avoidance를 위한 간단한 이론적 기법
+- 가정
+  - 한 종류(resource type)의 자원이 여러 개(unit)
+- 시스템을 항상 safe state로 유지   
+
+![img](https://github.com/koni114/Operating-system/blob/master/img/os_53.JPG)
+- 한 개의 타입의 소스, 총 10개의 소스가 있으며 3개의 프로세스가 있다고 가정
+- Max.Claim : 최대 자원 필요 개수. Cur.Alloc : 현재 할당 개수. Additional Need : 앞으로 필요한 개수.
+- 내가 10만원을 가지고 있을 때, 1,2,3번이 나한테 돈을 빌려달라고 함  
+  현재 1번 만원, 2번 5만원, 3번은 2만원을 빌랴준 상태, 나머지 필요한 금액이 존재  
+  가정은 다 믿을 수 있어 돈을 반드시 반납함
+- 그렇다면 누구한테 제일 먼저 빌려줄까? 라는 질문이 이 알고리즘의 핵심
+
+- 정답 
+  - 내 수중에 있는 2만원을 가지고 P1한테 빌려주면 일을 수행 후 3만원 반납  
+    그 다음 3만원을 P3에게 빌려주고, 마지막으로 P2에게 반납  
+  - Available resource units : 2
+  - 실행 종료 순서 : P1 -> P3 -> P2(Safe seqeunce)
+  - 현재 상태에서 안전 순서가 하나이상 존재하면 안전 상태임
+
+![img](https://github.com/koni114/Operating-system/blob/master/img/os_54.JPG)
+- State-2에서는 내가 가지고 있는 남은 자원을 가지고 그 누구도 만족시키지 못함 --> unsafe state
+- Available resource units : 3
+- No Safe sequnce
+- 반드시 교착상태는 아님! --> 자원을 빌려달라고 안 할 수도 있기 때문
+- 임의의 순간에 세 프로세스들이 모두 세 개 이상의 단위 자원을 요청하는 경우 시스템은 교착상태에 놓이게 됨
+- 그렇다면 banker's algorithm은 무엇일까? 
+
+![img](https://github.com/koni114/Operating-system/blob/master/img/os_53.JPG)
+- P1이 자원을 1개 더 요청. 그러면 빌려 줄지 말지 정해야 함
+- 알고리즘은 줬다고 가정하고 시뮬레이션을 돌려보는 것임. 시뮬레이션을 돌려보면 다음 처럼 됨
+
+![img](https://github.com/koni114/Operating-system/blob/master/img/os_54.JPG)
+- P1의 Cur.Alloc을 2로 만들어봄
+- 그런 다음 safe-state가 가능한지 확인 해보는 것임. --> 내 자원이 1인 상태에서 P1 -> P3 -> P2하면 됨
+- 반대로 P2가 자원을 하나 빌려달라고 한 경우에는 safe sequence가 없음
+- 이것이 바로 banker's algorithm
+
+### Habermann's algorithm
+- Dijstra's algorithm의 확장
+- 여러 종류의 자원 고려
+  - Multiple resource types
+  - Multiple resource units for each resource type
+- 시스템을 항상 safe state로 유지  
+
+![img](https://github.com/koni114/Operating-system/blob/master/img/os_55.JPG)
+- 3 types of resources : Ra, Rb, Rc
+- Number of resource units for each type : (10, 5, 7)
+- 5 processes
+
+![img](https://github.com/koni114/Operating-system/blob/master/img/os_56.JPG)
+- Available resource units : (3, 3, 2) 
+- Safe sequence : P2 -> P4 -> P1 -> P3 -> P5
+- Safe state because there exist a safe sequnce
+
+## Deadlock Avoidance
+- Deadlock의 발생을 막을 수 있음
+- High overhead
+  - 항상 시스템을 감시하고 있어야 함
+- Low resource utilization
+  - Safe state 유지를 위해, 사용되지 않는 자원이 존재
+- <b>Not practical</b>
+  - 가정
+    - 프로세스 수, 자원 수가 고정
+    - 필요한 최대 자원 수를 알고 있음
+
+## Deadlock Detection
+- Deadlock 방지를 위한 사전 작업을 하지 않음
+  - Deadlock이 발생 가능
+- 주기적으로 deadlock 발생 확인
+  - 시스템이 deadlock 상태인가?
+  - 어떤 프로세스가 deadlock 상태인가?
+- Resource Allocation Graph(RAG) 사용    
+
+### Resource Allocation Graph(RAG)
+![img](https://github.com/koni114/Operating-system/blob/master/img/os_58.JPG)
+- Deadlock 검출을 위하여 사용
+- Directed, bipartite Graph(process와 자원의 이분그래프)
+
+![img](https://github.com/koni114/Operating-system/blob/master/img/os_59.JPG)
+- Directed graph G = (N, E)
+  - N = {Np, Nr} where
+    - Np is the set of processes = {P1, P2, ... , Pn}
+    - and Nr is the set of resources = {R1, R2, ..., Rm}   
+
+![img](https://github.com/koni114/Operating-system/blob/master/img/os_60.JPG)
+- Resource Allocation Graph(RAG)
+  - Edge는 Np와 Nr 사이에만 존재
+    - e = (Pi, Rj) : 자원 요청
+    - e = (Rj, Pi) : 자원 할당   
+
+![img](https://github.com/koni114/Operating-system/blob/master/img/os_61.JPG)
+- Rk : k type의 자원
+- tk : Rk의 단위 자원 수(Rk에 속하는 자원 개수)
+- |(a,b)| : (a,b) edge의 수 
+
+### RAG example
+![img](https://github.com/koni114/Operating-system/blob/master/img/os_62.JPG)
+- 위 그림의 상태는 deadlock인가? 
+- 쉽게 deadlock 여부를 판단할 수 있는 algorithm이 존재 --> Graph reduction
+
+## Deadlock Detection Method
+- Graph reduction
+  - 주어진 RAG에서 edge를 하나씩 지워가는 방법
+  - Completely reduced(다 지워짐)
+    - 모든 edge가 제거 됨
+    - Deadlock에 빠진 프로세스가 없음
+  - Irreducible(다 지울 수 없는 edge가 있음)
+    - 지울 수 없는 edge가 존재
+    - 하나 이상의 프로세스가 deadlock 상태     
+  - Unblocked process
+    - unblocked process에 연결된 edge를 다 지움 
+    - 필요한 자원을 모두 할당 받을 수 있는 프로세스  
+![img](https://github.com/koni114/Operating-system/blob/master/img/os_63.JPG)
+- Pi가 요청하는 모든 자원에 대해(LHS)  
+- 각각의 자원들의 자원 수에서 해당 자원이 할당한 수를 뺀 값(RHS)보다 작으면 unblocked process 
+
+- Graph reduction procedure
+  - Unblocked preocess에 연결 된 모든 edge를 제거
+  - 더 이상 unblocked process가 없을 때까지 반복
+  - 최종 그래프에서
+    - 모든 edge가 제거됨(Completely reduced)
+      - 현재 상태에서 deadlock이 없음
+    - 일부 edge가 남음(irreducible)
+      - 자원을 할당 받을 수 없는 process가 존재한다는 의미 
+      - 현재 deadlock이 존재     
+
+- Graph Reduction(example 1)
+![img](https://github.com/koni114/Operating-system/blob/master/img/os_64.JPG)
+
+- Graph Reduction(example 2)
+![img](https://github.com/koni114/Operating-system/blob/master/img/os_65.JPG)
+
+- Graph Reduction
+  - High overhead
+    - 검사 주기에 영향을 받음
+    - Node의 수가 많은 경우
+  - Low overhead deadlock detection methods(Special case)
+    - Case-1) Single-unit resources
+      - Cycle detection 
+    - Case-2) Single-unit request in expedient state 
+      - Knot detection
+
+## Deadlock Avoidance vs Detection
+- Deadlock avoidance
+  - 최악의 경우를 생각
+    - 앞으로 일어날 일을 고려
+  - Deadlock이 발생 하지 않음
+- Deadlock detection
+  - 최선의 경우를 생각
+    - 현재 상태만 고려
+  - Deadlock 발생 시 Recovery 과정이 필요       
+
+## Deadlock Recovery
+- Deadlock을 검출 한 후 해결하는 과정
+- Deadlock recovery methods
+  - Process termination
+    - Deadlock 상태에 있는 프로세스를 종료 시킴 
+    - 강제 종료된 프로세스는 이후 재시작 됨 
+  - Resource preemption 
+    - Deadlock 상태 해결 위해 선점할 자원 선택
+    - 선정 된 자원을 가지고 있는 프로세스에서 자원을 빼앗음
+      - 자원을 빼앗긴 프로세스는 강제 종료됨  
+- Process termination
+  - Deadlock 상태인 프로세스 중 일부 종료
+  - Termination cost model
+    - 종료 시킬 deadlock 상태의 프로세스 선택
+    - Termination cost
+      - 우선순위 / Process priority
+      - 종류 / Process type
+      - 총 수행시간 / Accumulated execution time of the process
+      - 남은 수행 시간 / Remaining time of the process
+      - 종료 비용 / Accounting cost
+      - Etc.   
+  - 종료 프로세스 선택
+    - Lowest-termination cost process first
+      - Simple
+      - Low overhead
+      - 불필요한 프로세스들이 종료 될 가능성이 높음 
+    - Minimum cost recovery
+      - 최소 비용으로 deadlock 상태를 해소 할 수 있는 process 선택
+        - 모든 경우의 수를 고려 해야 함
+      - Complex
+      - High overhead
+        - O(2^k)         
+- Resource preemption
+  - Deadlock 상태 해결을 위해 선점할 자원 선택
+  - 해당 자원을 가지고 있는 프로세스를 종료시킴
+    - Deadlock 상태가 아닌 프로세스가 종료 될 수 있음
+    - 해당 프로세스는 이후 재시작 됨 
+  - 선점할 자원 선택
+    - Preemption cost model 필요
+    - Minimum cost recovery method 사용
+      - O(r)      
+- Checkpoint-restart-method
+  - 위의 recovery 방법들은 지금까지 수행해 온 process들을 불합리하게 종료시켜야 하는 단점이 있음 
+  - 프로세스의 수행 중 특정 지점(checkpoint)마다 context를 저장
+  - Rollback을 위해 사용
+    - 프로세스 강제 종료 후, 가장 최근의 checkpoint에서 재시작  
+
+![img](https://github.com/koni114/Operating-system/blob/master/img/os_66.JPG)

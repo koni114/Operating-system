@@ -1,0 +1,27 @@
+# OS 간단 정리
+## chapter07 교착상태(deadlock Resolution)
+- 교착상태란 어떤 프로세스도 자원을 가져갈 수 없는 상태를 말함
+- Blocked/Asleep: 프로세스가 특정 이벤트 때문에 필요한 자원을 기다리는 상태
+- deadlock: 프로세스가 발생 가능성이 없는 이벤트를 기다리는 경우  
+- deadlock vs starvation
+  - deadlock : event가 절대 발생할 수 없음
+  - starvation : 운이 나빠 발생을 안함
+- 자원의 분류
+  - 선점 가능 여부 --> 선점 가능하냐? 
+    - preemptible/non-preemptible
+  - 할당 단위 --> 쪼갤수 있느냐?
+    - Total/Partitioned 
+  - 동시 사용 가능 여부 --> shared 가능 여부
+    - exclusive/shared 
+  - 재사용 여부 --> 쓰고 또 쓰고 가능하냐?
+    - serially-reusable/consumable
+- 자원의 형태에 따른 deadlock 가능 여부
+  - non-preemptible/exclusive..
+- Deadlock model
+  - Graph-model/State transition model
+- <b>deadlock 발생 필요 조건</b>
+  - 자원 특성
+    - non-preemptible/exclusive use of resources
+  - 프로세스 특성
+    - hold and wait
+    - circular wait    
