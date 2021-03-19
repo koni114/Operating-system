@@ -1,4 +1,62 @@
 # OS 간단 정리
+
+## chapter02 운영체제 개요
+- 운영체제의 역할
+  - User Interface
+  - Resource management
+  - process and thread management
+  - system managemneta
+- 컴퓨터 시스템의 구성: HW -> reource -> kernel -> system call Interface -> user appilcation
+- 운영체제의 구분
+  - 사용자의 수 : signle(PC)/multi(server)
+  - 동시 실행의 수 : single/multi
+  - 작업 수행 방식 : 순차 처리 / batch system / time sharing system / personal computing / parallel processing system / distributed processing system / realTime system
+- parellel processing system vs distributed processing system
+  - 병렬 처리 --> 단일 시스템 내 둘 이상의 프로세서
+  - 분산 처리 --> 여러개의 서버를 두고 처리(네트워크 기반 병렬 처리)
+- 운영체제 구조
+  - 커널(kernel) : OS의 핵심부분, 가장 빈번하게 사용되는 기능들 담당
+  - 유틸리티(utility) : 커널 제외 나머지 부분, UI등 서비스 프로그램
+  - 단일 구조 / 계층 구조 / 마이크로 커널 구조 
+- 운영체제의 기능은 한마디로 관리! SW/HW 관리. processor, process, memory, File management, I/O Management 등
+
+## chapter03 process management
+- Job vs Process
+  - Job : program + Data 또는 program 이라고 함
+  - Process : 커널에 등록된 작업. 실제 프로그램이 수행되는 주체
+  - 프로그램이 메모리에 적재되면 프로세스라고 함
+- PCB(Process Control block)
+  - 프로세스 생성/관리/제거에 필요한 정보를 모아둔 block
+  - 프로세스 생성시 PCB 생성, 커널에 저장됨, OS별로 다름
+- 프로세스 상태 : 자원간의 상호작용에 의해 결정
+  - create state
+    - Job을 커널에 등록한 상태
+    - PCB 할당 및 proces 생성, 가용 메모리 공간 여부에 따라 ready 상태, suspended ready 상태로 감
+  - ready state
+    - CPU 자원 할당을 기다리고 있는 상태, cpu 자원 할당을 받으면 running 상태로 감. 이를 dispatch라고 함
+  - Running state 
+    - processor 할당 전부 받은 상태. 해당 상태를 벗어나는 경우는 2가지
+      - ready  : ready 상태로 바뀌는 것을 preemption 되었다고 함(주로 processor 자원 상태에 따라..)
+      - asleep/block : 다른 이벤트 발생(file IO 발생)하여 잠시 딴 일을 해야할 떄
+  - blocked/asleep state
+    - running 상태에서 잠시 특정한 일이 발생한 상태. 이떄 일이 해결되면 바로 running으로 가는 것이 아니라, ready 상태로 감
+  - suspended state
+    - process가 메모리를 할당 받지 못한 상태
+    - 지금까지 작업한 정보(memory image)를 swap device(일종의 하드 디스크)에 저장
+    - memory를 뺏기는 것을 swap out, swap in 이라고 함
+  - terminate/zombi state
+    - process가 끝난 상태. 모든 자원 반납 후, PCB 정보만 남아 있는 상태
+    - 여길 왜 들리는 걸까? 나중에 kernel이 PCB 정보를 수집해 나중에 기억하려고!
+  - 인터럽트(interrupt)
+    - 예상치 못한, 외부에서 발생한 이벤트
+    - 인터럽트 발생시, kernel이 개입해서 해당 프로세스 중단
+  - Context -> process와 관련된 정보들의 집합. 크게 두군데 저장됨
+  - Context Saving -> 현재 프로세스의 register context를 저장하는 작업
+  - Context restoring -> Register context를 프로세스로 복구하는 작업
+  - Context switching -> 인터럽트가 발생하여 CPU 점유가 바뀌는 경우 context switching이 발생
+  - Context switch overhead -> Context switching에 소요되는 비용
+
+
 ## chapter07 교착상태(deadlock Resolution)
 - 교착상태란 어떤 프로세스도 자원을 가져갈 수 없는 상태를 말함
 - Blocked/Asleep: 프로세스가 특정 이벤트 때문에 필요한 자원을 기다리는 상태
@@ -25,20 +83,3 @@
   - 프로세스 특성
     - hold and wait
     - circular wait    
-- deadlock 해결 방법
-  - prevention
-  - avoidance
-    - deadlock 방지 가능
-    - high overhead -> 항상 시스템 감시해야 함
-    - low resource untilization
-    - Non-practical 
-  - detection
-    - Resource allocation graph(RAG)을 통해 detection
-- deadlock detection method
-  - 주어진 RAG에서 unblocked process에 연결된 edge를 지워서  
-    남는 것이 있으면, deadlock. 다 지워지면 deadlock 아님  
-- deadlock recovery
-  - process 종료
-  - process termination 
-  - resource preemption
-  - checkpoint-restart-mothod
