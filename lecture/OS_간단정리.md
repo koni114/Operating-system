@@ -25,3 +25,20 @@
   - 프로세스 특성
     - hold and wait
     - circular wait    
+- deadlock 해결 방법
+  - prevention
+  - avoidance
+    - deadlock 방지 가능
+    - high overhead -> 항상 시스템 감시해야 함
+    - low resource untilization
+    - Non-practical 
+  - detection
+    - Resource allocation graph(RAG)을 통해 detection
+- deadlock detection method
+  - 주어진 RAG에서 unblocked process에 연결된 edge를 지워서  
+    남는 것이 있으면, deadlock. 다 지워지면 deadlock 아님  
+- deadlock recovery
+  - process 종료
+  - process termination 
+  - resource preemption
+  - checkpoint-restart-mothod
