@@ -189,20 +189,22 @@
 - 이번에는 해당 메모리가 Exit함. 이런식으로 exit가 일어나면, 자연스레 빈 공간이 생기게 됨
 
 ## 배치 전략(Placement strategies)
+- 앞서 본 것처럼 빈 공간이 군데군데 생겨나게 되는데, 이러한 공간에 어떻게 다시 프로세스를 배치할 것이냐?에 대한 전략
 - First-fit(최초적합)
+  - 위에서 부터 차례차례 SCAN하여 프로세스가 할당 가능한 공간에 바로 할당하는 방법 
   - 충분한 크기를 가진 첫 번째 partition 선택
-  - Simple and low overhead
-  - 공간 활용률이 떨어질 수 있음 
-
+  - Simple and low overhead --> 할당할 수 있는 제일 처음을 선택하는 것이므로 간단하고 low overhead
+  - 공간 활용률이 떨어질 수 있음 --> 프로세스가 12KB인데, 처음만난 공간이 13KB이면 사용할 확률이 낮아지는 등 누굴 만나느냐에 따라 공간활용률이 떨어질 수 있음  
+     
 ![img](https://github.com/koni114/Operating-system/blob/master/img/os_82.JPG)
 
 - Best-fit(최적적합)
-  - process가 들어갈 수 있는 partition중 가장 작은 곳 선택
+  - process가 들어갈 수 있는 partition중 <b>가장 작은 곳 선택</b>
   - 탐색시간이 오래 걸림
     - 모든 partition을 살펴봐야 함
   - 크기가 큰 partition을 유지할 수 있음
   - 작은 크기의 partition이 많이 발생
-    - 활용하기 너무 작은   
+    - 활용하기 너무 작아짐
 
 ![img](https://github.com/koni114/Operating-system/blob/master/img/os_83.JPG)
 
@@ -217,23 +219,33 @@
 ![img](https://github.com/koni114/Operating-system/blob/master/img/os_84.JPG)
 
 - Next-fit(순차 최초 적합)
+  - 프로세스를 할당한 위치의 다음부터 순차적으로 탐색하는 방법 
   - 최초 적합 전략과 유사
   - State table에서 마지막으로 탐색한 위치부터 탐색
   - 메모리 영역의 사용 빈도 균등화
   - Low overhead 
 
+
 ## Coalescing holes(공간 통합)
+- external fragmentation 문제가 발생한 경우의 해결 방법! 
 - 인접한 빈 영역을 하나의 partition으로 통합
   - process가 memory를 release하고 나가면 수행
   - Low overhead 
-
+- 하나의 프로세스가 나가고 난 후 빈 공간의 memory를 합치는 것을 coalescing holes 라고 함
+- 공간을 합치는 것은 프로세스가 나가고 난 후 바로 합치면 됨(overhead가 적은 일)
 ![img](https://github.com/koni114/Operating-system/blob/master/img/os_85.JPG)
 
 ## Storage Compaction(메모리 압축)
+- 공간이 비어있는데, 떨어져 있으면 빈 공간을 위로 쭉 올려서 공간을 만들어내는 것. 이를 공간 압축이라고 함
 - 모든 빈 공간을 하나로 통합
 - 프로세스 처리에 필요한 적재 공간 확보가 필요 할 때 수행
 - High overhead 
-  - 모든 process 재배치(Process 중지)
+  - 모든 process 재배치(Process 중지) --> 전체 위치를 변경해야 하기 때문
+  - 일정시간, 일정 기간 요청이 있을 때문 수행해야 함
   - 많은 시스템 자원을 소비 
 ![img](https://github.com/koni114/Operating-system/blob/master/img/os_86.JPG)
 
+- 이런 것들을 왜 공부해야 할까?   
+실제로 메모리를 할당 받는 행위(new ~~)는 속도가 많이 느려지는 행위. 그렇다면 빠르게 하기 위한 방법으로
+우리들 만의 memory pool을 만들어 메모리 시스템을 만들 수 있음. 즉 1GB 메모리 공간을 쓴다는 것을 알고 있으면  
+OS에게 일단 1GB의 메모리를 할당 받고(동적 할당이 1번만 있음), 그 다음부터는 OS까지 가지 말고, Pointer를 주고 10MB만써! 처럼 포인터에게 전달해 주면 됨. 그렇다면 메모리 할당 방법을 배웠으므로, FPM or VPM 등을 구현하여 적용할 수 있음. --> 이런 방법이 할당 동적 할당을 받는 것 보다 훨씬 빨라 성능의 이슈가 있을 때 이런 전략을 사용할 수 있음  
