@@ -83,3 +83,60 @@
   - 프로세스 특성
     - hold and wait
     - circular wait    
+
+## chapter 09 가상메모리
+- 가상메모리 : non-continuous allocation
+- non-continuous allocation
+  - 메모리를 여러개의 block 단위로 나눔 
+  - 필요한 부분만 메모리에 적재하고, 나머지 block은 swap device에 저장
+- non-continuous allocation 기법들
+  - paging system 
+  - segmentation system
+  - Hybrid paging/segmentation system 
+- block mapping
+  - 간단한 address mapping 
+- block mapping 순서
+  - virtual v = address(b, d) 
+  - process의 BMT(block map table)에 접근
+  - BMT에서 block b에 대한 항목(entry) 찾음
+  - Residence bit 검사
+    - 0 인 경우, 해당 block을 swap device에서 메모리로 가져옴
+    - 1 인 경우, 아래 단계 수행
+  - BMT에서 read address 값 a 확인
+  - 실제 주소 r = a + d 계산
+  - r을 이용하여 메모리에 접근   
+- paging system
+  - 프로그램을 같은 크기의 block 단위로 분할(page)
+  - 메모리에서 page 크기에 매핑되는 부분을 page frame이라고 함  
+- paging system의 특징
+  - 논리적 분할이 아니라, 물리적으로 동일한 크기로 분할
+  - No external fragmentation --> page의 크기가 동일
+  - Yes internal fragmentation   
+- paging system address mapping
+  - PMT(Page map table), kernel에 존재 
+  - address mapping algorithm
+    - Direct mapping
+    - Associative mapping
+    - Hybrid direct/associative mapping
+- Direct mapping 순서
+  - 가장 간단한 paging system에서의 address mapping 
+  - 해당 프로세스의 PMT가 저장되어 있는 주소 b에 접근
+  - 해당 PMT에서 page p에 대한 entry 찾음
+    - b(PMT base address) + (p * entrySize)
+  - 찾아간 entry의 존재 비트 검사
+    - bit가 0이면(page fault), running -> asleep하고, swap device에서 page을 메모리에 적재
+    - bit가 1이면 아래 단계 수행
+  - entry에서 pagr frame number(p') 확인
+  - p'와 가상 주소의 변위 d를 사용하여 실제 주소 r 형성
+    - r = p' * pageSize + d
+  - 실제 주소 r로 주기억장치에 접근  
+- Associate mapping
+  - TLB(translation Look-aside Buffer)에 PMT 적재(전용 HW)
+  - PMT를 병렬 탐색
+- Hybrid Direct/Associative Mapping
+  - 두 기법을 혼합하여 사용 
+  - Locality를 활용하여 최근에 사용한 page, 근처 page들만 TLB에 저장하고 나머지는 PMT에 저장
+- Hybrid Direct/Associative Mapping 순서
+  - TLB에 p가 적재되어 있는 경우, residnece bit 검사 후 page frame 확인
+  - TLB에 p가 적재되어 있지 않은 경우, PMT에서 page frame 확인
+  - 해당 page를 TLB에 적재

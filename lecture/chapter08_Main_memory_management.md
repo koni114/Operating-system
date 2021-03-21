@@ -53,6 +53,7 @@
 - HW의 도움이 필요
   - MMU : Memory Management Unit
 - 대부분의 OS가 사용 
+
 ![img](https://github.com/koni114/Operating-system/blob/master/img/os_72.JPG)
 
 ## Dynamic Loading
@@ -182,10 +183,12 @@
 ![img](https://github.com/koni114/Operating-system/blob/master/img/os_79.JPG)
 
 ![img](https://github.com/koni114/Operating-system/blob/master/img/os_80.JPG)
+
 - 차례 차례 동적으로 메모리를 할당하면 됨
 - 기억해야 할 것은, internal fragmentation이 일어나지 않음
 
 ![img](https://github.com/koni114/Operating-system/blob/master/img/os_81.JPG)
+
 - 이번에는 해당 메모리가 Exit함. 이런식으로 exit가 일어나면, 자연스레 빈 공간이 생기게 됨
 
 ## 배치 전략(Placement strategies)

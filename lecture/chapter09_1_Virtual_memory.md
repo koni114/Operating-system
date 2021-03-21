@@ -1,5 +1,6 @@
 # chapter 09 - 가상 메모리
 ## Virtual Storage(Memory)
+- 가상 메모리란, 메모리를 관리하는 방법 중 하나로, 실제 메모리 주소가 아닌 가상의 메모리 주소를 주는 방식을 말함
 - Non-continuous allocation
 - 사용자 프로그램을 여러 개의 block으로 분할
 - 실행 시, 필요한 block들만 메모리에 적재  
@@ -78,7 +79,7 @@
     - 메모리의 분할 영역(페이지를 넣는 틀)
     - Page와 같은 크기로 분할됨 
 ![img](https://github.com/koni114/Operating-system/blob/master/img/os_92.JPG)
-- swap device에 page 단위로 분할된 program이 존재(왼쪽 그림)
+- swap device에 page 단위로 분할된 program이 존재(오른쪽 그림)
 - 이러한 paged와 mapping된 page frame들이 존재
 - paging system 특징
   - 논리적 분할이 아님(일정한 크기에 따른 분할) 
@@ -88,11 +89,12 @@
   - Simple and Efficient
     - Segmentation 대비
   - No external fragmentation  
-  why? memory와 program이 같은 크기로 할당. 메모리 공간이 충분한데 못 올라가는 경우는 발생하지 않음
+  동일한 크기의 page  
+  why? memory와 program이 같은 크기로 할당. 메모리 공간이 충분한데 못 올라가는 경우는 발생하지 않음  
   - Internal fragmentation 발생 가능  
     언제 발생할까? program을 일정한 크기로 자르다가 마지막에 남는 작은 부분은 메모리 할당시 공간이 남게 됨       
 
-## Address Mapping(연속)
+## Paging - Address Mapping(연속)
 - Virtual address: v = (p, d)
   - p : page number
   - d : displacement(offset)
@@ -100,7 +102,7 @@
   - PMT(Page Map Table) 사용
 - Address mapping mechanism
   - Direct mapping(직접 사상)
-  - Associative mapping(직접 사상)
+  - Associative mapping(연관 사상)
     - TLB(Translation Look-aside Buffer)
   - Hybrid direct/associative mapping       
 - Page Map Table
@@ -159,8 +161,7 @@
   - HW 비용은 줄이고, Associative mapping의 장점 활용
 - 작은 크기의 TLB 사용
   - PMT : 메모리(커널 공간)에 저장
-  - TLB : PMT중 일부 entry들을 적재  
-    최근에 사용된 page들에 대한 entry 저장
+  - TLB : PMT중 일부 entry들을 적재. 최근에 사용된 page들에 대한 entry 저장
   - Locality(지역성) 활용
 - 프로세스의 PMT가 TLB에 적재되어 있는지 확인
   - TLB에 적재되어 있는 경우
