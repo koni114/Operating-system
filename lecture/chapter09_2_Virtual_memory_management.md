@@ -351,7 +351,7 @@ branch 4002
     - (1,1) : -> (0,1) 후 이동 
 - 중요한 것은 reference bit를 update bit보다 먼저 바꿔야 함
 
-![img](https://github.com/koni114/Operaating-system/blob/master/img/os_111.JPG)
+![img](https://github.com/koni114/Operating-system/blob/master/img/os_111.JPG)
 - clock algorithm에서 update bit가 붙음
 
 ### Other Algorithms
@@ -400,20 +400,20 @@ branch 4002
 - window size와 working set size의 관계?
 - 초반에는 window size를 조금만 늘려도 확 늘어남. but 계속 증가할수록 증가율은 줄어듬  
   --> locality 때문!   
-![img](https://github.com/koni114/Operaating-system /blob/master/img/os_113.JPG)
+![img](https://github.com/koni114/Operating-system/blob/master/img/os_113.JPG)
 
 - working set transition 예시
   - loop-1 동안에는 p0, p1을 참조 
   - ㅣoop-2 동안에는 3개, loop-3은 2개!  
-![img](https://github.com/koni114/Operaating-system/blob/master/img/os_114.JPG)
+![img](https://github.com/koni114/Operating-system/blob/master/img/os_114.JPG)
 
 - loop-1 -> loop-2로 바뀔 때는 일시적으로 working-set이 증가하는 현상을 보임
 - 해당 루프에서 전환하는 딱 그 시점에 두 루프의 프로세스 모두가 필요할 것이므로,
-![img](https://github.com/koni114/Operaating-system/blob/master/img/os_115.JPG)
+![img](https://github.com/koni114/Operating-system/blob/master/img/os_115.JPG)
 
 - working-set은 window size안에 들어오는 Page의 개수가 계속 달라지는 것을 확인!
 - page fault는 5번 일어남. 이것이 좋은 성능일까? 알기가 어려움. 주는 자원의 수가 다르기 때문
-![img](https://github.com/koni114/Operaating-system/blob/master/img/os_116.JPG)
+![img](https://github.com/koni114/Operating-system/blob/master/img/os_116.JPG)
 
 - 성능 평가 
   - Page fault 수 외 다른 지표도 함께 봐야 함
@@ -434,7 +434,7 @@ branch 4002
   - Residence set(상주 집합)을 page fault가 없더라도, 지속적으로 관리해야 함   
 - Mean number of frames allocated vs page fault rate
 
-![img](https://github.com/koni114/Operaating-system/blob/master/img/os_119.JPG)
+![img](https://github.com/koni114/Operating-system/blob/master/img/os_119.JPG)
 - window size가 커지면, page의 메모리 유지 비용(lifetime)이 커짐
 - 반대로 window size가 커지면, page fault rate는 줄어듬
 - 즉 window size는 적당히!
@@ -460,12 +460,15 @@ branch 4002
     - IFT = tc - tc-1
       - tc-1 : time of previous page fault
       - tc : time of current page fault
-    - IFT > tau
+    - IFT > tau(Low page fault rate) 
+      - Residence set <- (tc-1, tc] 동안 참조 된 pages들 만 유지
+      - 나머지 page들은 메모리에서 내림
+        - 메모리 할당('#' of page frames) 유지 및 감소  
+    - IFT <= tau(High page fault rate) 
       - 기존 pages들 유지 
       - + 현재 참조된 page를 추가 적재
-        - 메모리 할당('#' of page frames) 증가       
-
-![img](https://github.com/koni114/Operaating-system/blob/master/img/os_117.JPG)
+        - 메모리 할당('#' of page frames) 증가      
+![img](https://github.com/koni114/Operating-system/blob/master/img/os_117.JPG)
 - 성능 평가
   - Page fault 수 외 다른 지표도 함께 봐야 함
   - Example
@@ -490,20 +493,21 @@ branch 4002
   - 참조 된다면, page r을 유지
   - 참조 안 된다면, page r을 메모리에서 내림 
       
-![img](https://github.com/koni114/Operaating-system/blob/master/img/os_118.JPG)
+![img](https://github.com/koni114/Operating-system/blob/master/img/os_118.JPG)
 - 성능 평가
   - Page fault 수 외 다른 지표도 함께 봐야 함
   - Example
     - Time interval[1, 10]
       - '#' of page fault = 5
       - 평균 할당 page frame 수 = 1.6
-    - 평가
-      - 평균 1.6개의 page frame을 할당 받은 상태에서 5번의 page fault 발생     
-- 최적 성능을 위한 delta는?
-  - delta = R / U 
-    - U : 한번의 참조 시간 동안 page를 메모리에 유지하는 비용
-    - R : page fault가 발생 시 처리 비용
-  - R > delta * U,(delta가 작으면)
-    - 처리 비용 > page 유지 비용
-  - R < delta * U,(delta 가 크면)
-    - page fault 처리 비용 < 유지 비용     
+    - 평가   
+      - 평균 1.6개의 page frame을 할당 받은 상태에서 5번의 page fault 발생      
+- 최적 성능을 위한 delta는?  
+  - delta = R / U  
+    - U : 한번의 참조 시간 동안 page를 메모리에 유지하는 비용  
+    - R : page fault가 발생 시 처리 비용   
+  - R > delta * U,(delta가 작으면)     
+    - 처리 비용 > page 유지 비용    
+  - R < delta * U,(delta 가 크면)  
+    - page fault 처리 비용 < 유지 비용
+    
