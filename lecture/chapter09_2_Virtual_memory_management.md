@@ -382,8 +382,6 @@ branch 4002
     - The working set of a process at time t
     - Time interval[t-delta, t] 동안 참조된 pages 들의 집합 
     - delta : window size, system paramter 
-
-![img](https://github.com/koni114/Operaating-system/blob/master/img/os_112.JPG)
 - window 안에 있는 page 들을 메모리 상에 올리는 것이 working set
 - window 안에는 최소 1개, 최대 delta 개의 page를 볼 수 있음  
   최대 delta개인 이유는 우리가 최대 delta+1 시간 동안에만 볼 수 있기 때문
@@ -467,8 +465,7 @@ branch 4002
     - IFT <= tau(High page fault rate) 
       - 기존 pages들 유지 
       - + 현재 참조된 page를 추가 적재
-        - 메모리 할당('#' of page frames) 증가      
-![img](https://github.com/koni114/Operating-system/blob/master/img/os_117.JPG)
+        - 메모리 할당('#' of page frames) 증가
 - 성능 평가
   - Page fault 수 외 다른 지표도 함께 봐야 함
   - Example
@@ -510,4 +507,67 @@ branch 4002
     - 처리 비용 > page 유지 비용    
   - R < delta * U,(delta 가 크면)  
     - page fault 처리 비용 < 유지 비용
+
+ ## Other Considerations
+ - Page size
+ - Program restructuring
+ - TLB reach
+
+### Page size
+- 시스템 특성에 따라 다름
+  - No best answer!
+  - 점점 커지는 경향
+- 일반적인 page size
+  - 2^7(128) bytes ~ 2^22 (4M) bytes
+- Small page size
+  - Large page table / # of PF
+    - High overhead(kernel)
+  - 내부 단편화 감소
+  - I/O 시간 증가
+  - Locality 향상
+  - Page fault 증가
+- Large page size
+  - small page table / # of PF
+  - 내부 단편화 증가
+  - I/O 시간 감소
+  - Locality 저하
+  - Page fault 감소  
+
+### Program Restructuring
+- 가상 메모리 시스템의 특성에 맞도록 프로그램을 재구성
+- 사용자가 가상 메모리 관리 기법(예, paging system)에 대해 이해하고 있다면, 프로그램의 구조를 변경하여  
+  성능을 높일 수 있음
+- Example
+  - Paging system, Page size = 1 KB
+  - sizeof(int) = 4 bytes
+~~~c
+// program 1
+int main()
+{
+  int zar[256][256];
+  int i, j;
+
+  for(j = 0;  j < 256; j++)
+    for(i = 0; i < 256; i++)
+      zar[i][j] = 0;
     
+  return 0;
+}
+~~~  
+
+- Row-major order for array
+![img](https://github.com/koni114/Operating-system/blob/master/img/os_120.JPG)
+
+![img](https://github.com/koni114/Operating-system/blob/master/img/os_121.JPG)
+
+- 가상 메모리 시스템의 특성에 맞도록 프로그램을 재구성
+- 사용자가 가상 메모리 관리 기법(예, paging system)에 대해 이해하고 있다면, 프로그램의 구조를 변경하여 성능을 높일 수 있음
+
+### TLB Reach
+- TLB를 통해 접근 할 수 있는 메모리의 양
+- TLB의 hit ratio를 높이려면,
+  - TLB의 크기 증가
+    - expensive 
+  - Page 크기 증가 or 다양한 page size 지원
+    - OS의 지원이 필요
+      - 최근 OS의 발전 방향    

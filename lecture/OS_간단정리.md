@@ -140,3 +140,41 @@
   - TLB에 p가 적재되어 있는 경우, residnece bit 검사 후 page frame 확인
   - TLB에 p가 적재되어 있지 않은 경우, PMT에서 page frame 확인
   - 해당 page를 TLB에 적재
+
+## chapter09_2 가상 메모리 관리
+- Cost Model for Virtual Mem Sys.
+  - Page fault : 메모리에 page가 없는 경우, page fault 발생
+  - process가 running -> asleep 상태로 변환되고, 이 때 context switching  발생
+- Page reference string(d)
+  - 참조한 page들을 문자열로 써 놓은 것
+  - 프로세스의 수행 중 참조한 페이지 번호 순서  
+- Hardware component
+  - Bit vectors: 메모리 상에 page가 가득 찼을 때, 새로운 page를 할당하려고 할 때 활용 
+    - reference bit : 해당 page의 참조 여부를 1,0으로 기록한 bit
+    - update bit : 갱신 비트 --> page data가 갱신되었는가? 
+- reference bit
+  - 해당 page의 참조 여부 기록. 
+  - 주기적으로 해당 bit를 0으로 초기화 
+- update bit
+  - Page가 메모리에 적재된 후, 프로세스에 의해 수정되었는지를 표시
+  - 프로세스가 page를 변경하면, 데이터 무결성을 위하여 swap-device에도 정보를 알려줘야 함 
+- 가상 메모리 성능 향상을 위한 관리 기법들
+  - allocation strategies  -> 어떻게 메모리 할당을 할 것인가? 
+    - fixed allocation --> 정해진 크기만큼 pf 할당
+    - variable allocation --> 동적 크기만큼 pf 할당
+  - Fetch strategies       -> 특정 page를 메모리에 언제 적재할 것인가? 
+    - demand fetch --> 프로세스가 참조하는 page들만 적재
+    - anticipatory fetch --> 가까운 미래에 참조될 가능성이 높은 page를 미리 적재(pre-paging, preFetch등)  
+  - placement strategies   -> 어디에 적재할 것인가?
+    - paging system에서는 불필요
+    - segmentation system --> best/worst/first/next - fit  
+  - replacement strategies -> 새로운 page를 어떻게 교체할 것인가? 
+    - fixed replacement를 위한 기법
+    - variable replacement를 위한 기법
+  - clean strategies       -> 변경된 page를 언제 write-back 할 것인가? 
+    - demand cleaning : 해당 page에 메모리에서 내려올 때 write-back
+    - anticipatory cleaning : 더 이상 변경될 가능성이 없다고 판단 할 때 미리 write-back 
+  - load control strategies
+    - load : 부하
+    - multi-programming degree(수행되는 프로세스 수) 조절  
+- thrashing --> 과도한 page fault 현상 발생
