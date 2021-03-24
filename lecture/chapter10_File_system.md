@@ -208,7 +208,8 @@
 - Access Matrix 기법
 
 ### Access Matrix
-- 범위(domain)와 개체(object)사이의 접근 권한을 명시
+- 접근 권한을 2차원 table에 저장을 하겠다는 것
+- 범위(domain --> userGroup)와 개체(object--> file)사이의 접근 권한을 명시
 - Terminologies
   - Object
     - 접근 대상(file, device 등 HW/SW objects)
@@ -226,6 +227,7 @@
  
 ### Global Table
 - 시스템 전체 file들에 대한 권한을 table로 유지
+- 권한을 부여하지 않는 녀석들까지도 저장해야 함
    - <domain-name, object-name, right-set> 
 - 단점
   - Large table size
@@ -233,28 +235,32 @@
 
 ### Access List
 - Access matrix의 열(column)을 list로 표현
+- Global table과 비교했을 때, 권한을 부여하지 않은(공백) 애들은 저장 안해도 됨
   - 각 object에 대한 접근 권한을 나열
   - Alist(Fk) = {<D1, R1>, <D2, R2>, ..., <Dm, Rm>}
 - Object 생성 시, 각 domain에 대한 권한 부여
 - Object 접근 시 권한을 검사
-- 실제 OS에서 많이 사용됨 
-  - UNIX의 예 --> r w x , r w x, r w x 
+- 실제 OS에서 많이 사용됨
+  - UNIX의 예 --> rwx , rwx, rwx
+- 단점 : 항상 파일에 접근할 때마다 권한을 확인해야 하는 overhead가 발생
 
 ### Capability List
+- 일종의 신분증
 - Access matrix의 행(row)을 list로 표현
   - 각 domain에 대한 접근 권한 나열
   - Clist(D1) = {<F1, R1>, <F2, R2>, ..., <Fp, Rp>}
 - Capability를 가짐이 권한을 가짐을 의미
   - 프로세스가 권한을 제시, 시스템이 검증 승인
 - 시스템이 capability list 자체를 보호 해야 함
-  - kernel안에 저장     
-- Lock-key Mechanism
-  - Access list와 Capability list를 혼합한 개념 
-  - Object는 Lock을, Domain은 key를 가짐
-    - Lock/key : unique bit patterns
-  - Domain 내 프로세스가 object에 접근 시,  
-    - 자시의 key와 object의 lock 짝이 맞아야 함  
-  - 시스템은 key list를 관리해야 함     
+  - kernel안에 저장  
+
+### Lock-key Mechanism
+- Access list와 Capability list를 혼합한 개념 
+- Object는 Lock을, Domain은 key를 가짐
+  - Lock/key : unique bit patterns
+- Domain 내 프로세스가 object에 접근 시,  
+  - 자시의 key와 object의 lock 짝이 맞아야 함  
+- 시스템은 key list를 관리해야 함     
 
 ### Comparison of Implementations
 - Global table
@@ -265,7 +271,8 @@
     - Object 많이 접근하는 경우 -> 느림
 - Capability lists
   - List내 object들(localized Info.)에 대한 접근에 유리
-  - Object별 권한 관리가 어려움      
+  - Object별 권한 관리가 어려움  
+    만약 특정 object에 대해서 모든 domain에 대해서 read 권한을 부여해야 한다면 모든 list를 다 뒤져 봐야 함
 - 많은 OS가 Access list와 Capability list 개념을 함께 사용
   - Object에 대한 첫 접근 -> access list 탐색 
     - 접근 허용 시, Capability 생성 후 해당 프로세스에게 전달
@@ -277,3 +284,74 @@
   - File 저장을 위한 디스크 공간 할당 방법
 - Free space management
   - 디스크의 빈 공간 관리   
+
+## File System Implementation
+- Allocation methods
+  - File 저장을 위한 디스크 공간 할당 방법
+- Free space management
+  - 디스크의 빈 공간 관리 
+
+### Allocation Methods
+- Continuous allocation
+- Discontinuous allocation
+  - Linked allocation
+  - Indexed allocation  
+
+### Continuous Allocation
+- 한 File을 디스크읜 연속된 block에 저장
+- 장점
+  - 효율적인 file 접근(순차, 직접 접근)
+- 문제점
+  - 새로운 file을 위한 공간 확보가 어려움
+  - External fragmentation
+  - File 공간 크기 결정이 어려움
+    - 파일이 커져야 하는 경우 고려해야 함    
+
+### Linked Allocation
+- File이 저장된 block들을 linked list로 연결
+  - 비연속 할당 가능
+- Directory는 각 file에 대한 첫 번째 block에 대한 포인터를 가짐
+- Simple, No external fragmentation
+- 단점
+  - 직접 접근에 비효율적
+  - 포인터 저장을 위한 공간 필요
+  - 신뢰성 문제 
+    - 사용자가 포인터를 실수로 건드리는 문제 등    
+
+### Linked Allocation: variation -> FAT
+- File Allocation Table(FAT)
+  - 각 block의 시작 부분에 다음 블록의 번호를 기록하는 방법
+- MS-DOS, Windows 등에 사용 됨    
+
+![img](https://github.com/koni114/Operating-system/blob/master/img/os_129.JPG)
+
+### Indexed Allocation
+- File이 저장된 block의 정보(pointer)를 Index block에 모아 둠
+- 직접 접근에 효율적
+  - 순차 접근에는 비효율적
+- File당 Index block을 유지
+  - Space overhead
+  - Index block 크기에 따라 파일의 최대 크기가 제한됨
+- Unix 등에 사용됨    
+
+## Free Space management
+- Bit vector
+- Linked list
+- Grouping
+- Counting
+
+### Bit vector
+- 시스템 내 모든 block들에 대한 사용 여부를 1 bit flag로 표시
+- Simple and efficient
+- Bit vector 전체를 메모리에 보관해야 함
+
+### Linked list
+- 빈 block을 linked list로 연결
+- 비효율적
+
+### Grouping
+- 
+
+### Counting
+- 연속된 빈 block들 중 첫 번째 block의 주소와 연속된 block의 수를 table로 유지
+- Continuous allocation 시스템에 유리한 기법
