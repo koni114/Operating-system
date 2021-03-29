@@ -15,7 +15,7 @@
   - 사용자가 불법적인 형태로 사용하려고 할 때 보호하고자 하는 역할
 
 ## 컴퓨터 시스템의 구성
-![img](https://github.com/koni114/Operating-system/blob/master/img/os_1.jpg)
+![img](https://github.com/koni114/Operating-system/blob/master/img/os_1.JPG)
 
 - 운영체제의 핵심은 kernel
 - kernel 위에는 system call interface가 있음  

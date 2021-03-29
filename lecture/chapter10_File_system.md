@@ -350,7 +350,8 @@
 - 비효율적
 
 ### Grouping
-- 
+- n개의 빈 block을 그룹으로 묶고, 그룹 단위로 linked list로 연결
+- 연속된 빈 block을 쉽게 찾을 수 있음
 
 ### Counting
 - 연속된 빈 block들 중 첫 번째 block의 주소와 연속된 block의 수를 table로 유지

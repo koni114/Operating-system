@@ -1,4 +1,60 @@
 # OS 간단 정리
+## chapter01 computer system overview
+- Operation System
+  - HW를 효율적으로 관리해주는 SW
+  - 사용자, application program에게 서비스를 제공하는 SW
+- 컴퓨터 하드웨어
+  - processor
+  - memory
+  - 주변장치
+- processor
+  - 컴퓨터의 두뇌(중앙처리장치)
+  - 연산 수행
+  - 컴퓨터의 모든 장치의 동작 제어 
+- Processor 구성
+  - 레지스터 <-> 제어장치 <-> 연산장치 
+- 레지스터
+  - 프로세서 내부에 있는 메모리
+  - 프로세서가 저장할 데이터 저장
+  - 컴퓨터에서 가장 빠른 메모리 
+- OS는 프로세서를 관리하는 역할을 포함
+- memory
+  - 저장하는 장치
+  - 프로그램을 저장함. ex) os, 사용자 sw, 사용자 데이터 등 
+- 레지스터 <- 캐시 <- 메인 메모리 <- 보조기억장치 순으로 빠르고 비쌈 
+- memory의 종류
+  - 주기억장치(main memory)
+    - processor는 메인 메모리까지만 접근하고, Disk는 못감
+    - cpu speed는 많이 증가하였으나, disk speed는 큰 변화가 없어, 이 둘 사이의 간극을 채우기 위하여  
+      main memory 등장
+    - cpu가 일을 하는 동안, disk에서 main memory에 미리 가져다 둠
+  - 캐시(cache)
+    - cpu 안에 들어가 있으며, processor 옆에 레지스터 보다 더 멀리 있음
+    - main memory와 cpu 사이의 병목 현상을 해결해 주기 위하여 존재
+    - 캐시의 동작은 HW가 알아서 해결해 줌
+    - processor가 우선적으로 캐시에 메모리가 있는지 확인
+      - 없으면 main memory에 들려 캐시에 두고 가져감(cache miss)
+      - 있으면 캐시에서 가져감(cache hit) 
+  - 보조기억장치
+    - ex) USB, CD, 등..
+    - 프로세서가 직접 접근 할 수 없음. 쓰려면 메인 메모리에 올려놓고 사용해야 함 
+    - 실행하려는 프로그램이 20GB인데, 메모리가 8GB인데 어떻게 사용 가능? --> virtual memory 
+- 지역성(locality)
+  - 지역성 때문에 캐시가 128kb여도 성능을 낼 수 있음
+  - 공간적 지역성 : 참조한 주소와 인접한 주소를 참조하려는 특성. ex) 순차적 program
+  - 시간적 지역성 : 한번 참조한 주소를 다시 참조하려는 특성. ex) for loop
+- 메모리도 운영체제가 관리하는 중요한 녀석 중 하나
+- 캐시는 메인 메모리에서 데이터를 가져올 때 특정 한 데이터만 가져오는 것이 아니라 block단위로 가져오기 때문에  
+  공간적 지역성을 이해할 수 있음
+- <b>시스템 버스(system bus)</b>  
+  - 하드웨어들이 데이터 및 신호를 주고받는 통로
+  - 데이터 버스, 주소 버스, 제어 버스 등이 있고, 각 개체들을 운반하는 버스라고 생각하면 됨
+- 주변장치
+  - 프로세서, 메모리를 제외한 하드웨어들
+  - 입력장치, 출력장치, 저장장치
+  - 장치 드라이버 관리
+  - 인터럽트 처리
+  - 파일 및 디스크 관리
 
 ## chapter02 운영체제 개요
 - 운영체제의 역할
@@ -178,3 +234,36 @@
     - load : 부하
     - multi-programming degree(수행되는 프로세스 수) 조절  
 - thrashing --> 과도한 page fault 현상 발생
+
+## chapter 10 File system
+- Disk System : 데이터 영구 저장 장치(비휘발성)
+  - Sector : 데이터 저장/판독의 물리적 단위
+  - Track : Platter 한 면에서 중심으로 같은 거리에 있는 sector들의 집합 
+  - Cylinder : 같은 반지름을 갖는 track들의 집합
+  - Platter : 앞뒤 자성의 물질을 입힌 동그란 CD 
+  - Surface : Platter 윗면과 아랫면
+- Disk Drive
+  - HDD의 형태. Disk pack에 데이터를 기록하거나 판독할 수 있도록 구성된 장치
+  - Head : Arm 끝부분, platter와 접촉하고 있는 부분
+  - Arm : Head를 고정/지탱
+  - Positioner : Arm을 지탱 -> Arm을 고정하고 있는 기둥
+  - Spindle 
+- Disk Address
+  - Physical address : sector의 실제 address
+  - Logical address : Disk system의 데이터 전체를 block들의 나열로 취급
+- Disk Address Mapping
+  - OS -> Disk driver -> Disk Controller
+  - OS는 block number를 disk driver에게 전달. 전달된 주소를 실제 물리 주소로 변환하여 disk controller에게 전달    
+- File System
+  - 사용자들이 사용하는 파일들을 관리하는 운영체제의 한 부분
+  - File system의 구성
+    - File
+    - Directory structure
+    - Partitions
+      - Directory들의 집합을 논리적/물리적으로 구분   
+- File concept
+  - 보조 기억 장치에 저장된 연관된 정보들의 집합
+    - 보조 기억 장치 할당의 최소 단위
+    - Sequence of bytes(물리적 정의) 
+  - OS는 file operation에 대한 system call을 제공해야 함
+  - system call은 os의 기능 중에 사용자가 사용할 수 있는 기능들의 집합
