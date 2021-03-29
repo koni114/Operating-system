@@ -38,7 +38,7 @@
 - 계정 정보
 
 ## 프로세스 상태
-- 자원간의 상호 작용에 의해 결정 
+- 자원 간의 상호 작용에 의해 결정 
 
 ### create state
 - Job을 커널에 등록한 상태
@@ -67,7 +67,7 @@
 
 ### Suspended State
 - process가 Memory 할당받지 못한 상태를 말함
-- prcess가 지금까지 한 정보를 어딘가에 저장 해야함. 즉 뺏기기 전에 memory image로 저장
+- process가 지금까지 한 정보를 어딘가에 저장 해야함. 즉 뺏기기 전에 memory image로 저장
 - memory image를 swap device(일종의 hard disk)에 저장
 - memory를 뺏기는 것을 swap out, 복구하는 것을 swap in 이라고 함
 

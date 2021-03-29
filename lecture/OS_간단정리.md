@@ -63,28 +63,64 @@
   - process and thread management
   - system managemneta
 - 컴퓨터 시스템의 구성: HW -> reource -> kernel -> system call Interface -> user appilcation
+- 사용자가 kernel에 직접 접근하면 문제 발생의 여지가 있으므로, OS에게 필요한 기능을 요청하기 위한 통로가 system call interface임
 - 운영체제의 구분
   - 사용자의 수 : signle(PC)/multi(server)
   - 동시 실행의 수 : single/multi
   - 작업 수행 방식 : 순차 처리 / batch system / time sharing system / personal computing / parallel processing system / distributed processing system / realTime system
+  - 대부분 system은 time sharing system 사용
+- Distributed Processing system
+  - network를 이용해서 여러개의 컴퓨터를 묶은 시스템
+  - 물리적인 분산, 통신망 이용한 상호 연결
+  - 컴퓨터를 노드라고 하는데, 각 노드마다 자기만의 OS를 가지고 있고, 각각의 OS를 잘 관리하게끔 하기 위하여 분산운영체제를 통해 하나의 프로그램, 자원처럼 사용 가능 
+  - ex) cluster system, client-server system 등 
+- real time system
+  - 작업 처리에 deadline을 갖는 시스템 
+  - 제한 시간 내에 서비스를 제공하는 것이 자원 활용 효율보다 중요
 - parellel processing system vs distributed processing system
   - 병렬 처리 --> 단일 시스템 내 둘 이상의 프로세서
   - 분산 처리 --> 여러개의 서버를 두고 처리(네트워크 기반 병렬 처리)
 - 운영체제 구조
-  - 커널(kernel) : OS의 핵심부분, 가장 빈번하게 사용되는 기능들 담당
+  - 커널(kernel) : OS의 핵심부분(메모리 상주), 가장 빈번하게 사용되는 기능들 담당
   - 유틸리티(utility) : 커널 제외 나머지 부분, UI등 서비스 프로그램
   - 단일 구조 / 계층 구조 / 마이크로 커널 구조 
 - 운영체제의 기능은 한마디로 관리! SW/HW 관리. processor, process, memory, File management, I/O Management 등
+- OS의 역할 - 프로세스 관리
+  - 생성/삭제, 상태관리(PCB..?)
+  - 자원 할당
+  - 프로세스 간 통신 및 동기화
+  - 교착상태(deadlock) 해결
+- OS의 역할 - Processor 관리
+  - 프로세스 스케줄링
+  - 프로세스 할당 관리
+- OS의 역할 - File management
+- OS의 역할 - I/O management  
 
 ## chapter03 process management
 - Job vs Process
-  - Job : program + Data 또는 program 이라고 함
+  - Job : program + Data 또는 program 이라고 함. 컴퓨터 시스템에 실행 요청 전 상태
   - Process : 커널에 등록된 작업. 실제 프로그램이 수행되는 주체
+  - 시스템 성능 향상을 위해 프로세스는 커널에 의해 관리됨
   - 프로그램이 메모리에 적재되면 프로세스라고 함
+- 프로세스의 정의
+  - 실행 중인 프로그램
+  - 커널에 등록된 Job
+  - 능동적인 개체
+- 자원(Resource)의 개념
+  - 커널의 관리하에 프로세스에게 할당/반납되는 수동적인 개체(passive entity)    
 - PCB(Process Control block)
+  - 메인 메모리에 존재 
   - 프로세스 생성/관리/제거에 필요한 정보를 모아둔 block
   - 프로세스 생성시 PCB 생성, 커널에 저장됨, OS별로 다름
+  - PCB 참조 및 갱신 속도는 OS 성능 중 중요한 요소 중 하나
 - 프로세스 상태 : 자원간의 상호작용에 의해 결정
+  - create state : 커널에 Job이 할당된 상태
+  - ready state : memory 할당 O, CPU 할당 X
+  - running state : memory, cpu 할당 O
+  - Blocked/Asleep state : running -> I/O 작업 수행을 위한 상태
+  - suspended state : process가 memory에 할당받지 못한 상태
+  - terminate/zombi state : process 수행이 끝난 상태. 모든 자원 반납후 일부 PCB 정보만 남아 있는 상태
+- 프로세스 상태 세부 정리
   - create state
     - Job을 커널에 등록한 상태
     - PCB 할당 및 proces 생성, 가용 메모리 공간 여부에 따라 ready 상태, suspended ready 상태로 감
@@ -103,14 +139,126 @@
   - terminate/zombi state
     - process가 끝난 상태. 모든 자원 반납 후, PCB 정보만 남아 있는 상태
     - 여길 왜 들리는 걸까? 나중에 kernel이 PCB 정보를 수집해 나중에 기억하려고!
-  - 인터럽트(interrupt)
-    - 예상치 못한, 외부에서 발생한 이벤트
-    - 인터럽트 발생시, kernel이 개입해서 해당 프로세스 중단
+- 인터럽트(interrupt)
+  - 예상치 못한, 외부에서 발생한 이벤트
+  - 인터럽트 발생시, kernel이 개입해서 해당 프로세스 중단
+- 인터럽트 처리 과정
+  - 인터럽트 발생 -> 프로세스 중단(커널 개입) -> 인터럽트 처리(interrupt handling) -> 인터럽트 발생 장소, 원인 파악 -> 인터럽트 서비스 여부 결정 -> 인터럽트 서비스 루틴 호출 
+- context switching(문맥 교환)
   - Context -> process와 관련된 정보들의 집합. 크게 두군데 저장됨
   - Context Saving -> 현재 프로세스의 register context를 저장하는 작업
   - Context restoring -> Register context를 프로세스로 복구하는 작업
   - Context switching -> 인터럽트가 발생하여 CPU 점유가 바뀌는 경우 context switching이 발생
   - Context switch overhead -> Context switching에 소요되는 비용
+- context swithcing process
+  - cpu 내에는 register가 있고, 바깥에 main memory가 있는데 이 때 process가 수행될 때 필요한 정보들은 register에 있어야 하고, 이는 Main memory에서 가져와야 함
+- 이 때 register에 있는 정보들을 register context라고 함
+- 나머지 다양한 정보들(code, data, stack, pcb)는 메인 메모리에 있음
+- 인터럽트 발생하여 cpu를 뺏긴다면 지금까지 진행한 정보(register context)를 main memory내 pcb에 저장 --> context saving
+- context saving된 정보를 불러오는 것 --> context restoring
+- context saving + context restoring --> context switching
+- context switching은 overhead가 발생하기 때문에 thread를 사용!
+- 용어 기억하기
+  - dispatch : ready state -> running state 
+  - preemption : running state -> ready state
+  - swap in / swap out : suspended state <-> ready / asleep 
+
+
+## chapter 04 thread management
+- 프로세스는 자원을 할당받아 제어를 수행하면서 목적을 달성
+- 이 때 제어에 해당하는 부분을 thread
+- 하나의 프로세스 안에는 여러 개의 thread가 있을 수 있음
+- Resource
+  - resource에는 코드, 전역 데이터, heap 등이 있을 수 있음 
+  - heap --> 코드를 수행 할 공간
+- 제어 영역
+  - SP(stack pointer), PC(program counter), 지역 데이터, stack 등이 있음
+  - 지역 데이터 --> 지역 변수 등. 지역 데이터는 stack에 저장
+  - <b>제어 영역에 해당하는 process를 우리는 thread라고 부름</b>
+  - <b>프로세스 안에는 여러 개의 스레드가 있으며, 이는 자원을 공유한다!</b>
+- 같은 프로세스의 스레드들은 동일한 주소 공간을 공유함
+- 스레드마다 각자의 작업영역을 가짐. thread sp들은 공유되는 자원(코드)를 제어
+- 스레드
+  - Light weight process(LWP)라고도 부름
+  - <b>processor 활용의 기본 단위</b>
+  - 스레드 기본 구성요소
+    - thread ID
+    - Register set(pc, sp 등)
+    - stack(local data)   
+- single thread vs multi thread
+  - single thread : process 내 1개 thread
+  - multi thread : process 내 여러개의 thread 
+- thread의 장점
+  - 자원 공유(효율성 증가) : process에 비해 context switching이 덜 일어남
+  - 경제성 : 자원을 공유
+  - multi-processor(CPU)의 활용: 병렬처리 가능
+  - 사용자 응답성 : multi-thread가 가능하기 때문에 처리가 지연되더라도 다른 thread는 작업 수행 가능
+- thread 구현
+- 스레드 생성 주체가 thread냐, kernel이냐에 따라서 달라짐
+  - user thread
+  - kernel thread
+- user thread
+  - 커널은 스레드의 존재를 모르기 때문에 모드 간의 전환이 없어 overhead가 적음
+  - 하나의 스레드가 커널에 의해 block되면 프로세스 전체가 block됨
+- kernel thread
+  - 커널이 직접 제공해주기 때문에 안정성과 다양한 기능 제공
+  - 유저모드와 커널모드의 빈번한 발생 때문에 overhead 발생  
+- multi-threading model
+  - user thread + kernel thread(n:m model)
+  - 두 가지의 모드의 장점만을 취득한 모델
+  - 효율적이면서도 유연하지만 복잡하다는 단점이 있음
+
+## chapter05 프로세스 스케줄링(process scheduling)
+- 다중 프로그래밍(multi-programming)
+  - 여러개의 프로그램이 시스템 내에 존재하는 것을 말함
+  - 여러개의 프로그램에 자원을 할당해야 하는데, 이를 스케줄링이라고 함 
+- 자원 관리 방법
+  - Time sharing : CPU와 같이 한 번에 한명만 들어갈 수 있는 경우 
+  - Space sharing : 하나의 자원을 분할하여 동시에 사용
+- 스케줄링의 목적
+  - 시스템의 성능 향상이 목적
+  - 대표적 시스템 성능 지표: 목적에 맞는 지표를 고려하여 스케줄링 기법을 선택해야함
+    - 응답시간(response time)
+    - 작업처리량(throughout)
+    - 자원 활용도  
+- 스케줄링 기법이 고려하는 항목들
+  - 프로세스 특성: I/O bounded / compute-bounded 
+  - 시스템 특성: batch system / interactive system처럼 시스템의 특성에 따라 스케줄링 기준이 달라짐
+  - 프로세스의 긴급성 : hard /soft-real time 등에 따라서 달라짐
+  - 프로세스 우선순위(priority)
+  - 프로세스 총 실행 시간(total service time)
+- CPU burst vs I/O burst
+  - 프로세스 수행은 cpu를 통한 계산과 I/O의 반복으로 이루어짐
+  - compute-bounded process -> cpu기반 계산이 더 많이 수행되는 process
+  - I/O bounded process -> I/O를 더 많이 수행하는 process
+- scheduling level
+  - long-term scheduling : Job-scheduling
+  - mid-term scheduling : memory allocation
+  - short-term scheduling : process scheduling
+- long-term scheduling - Job scheduling
+  - 여러 job들 중 순서에 맞게 process로 변환시켜주는 스케줄링
+  - kernel에 제출할 job 순서 결정 
+  - multi-programming의 degree를 조절 - 시스템 내에 프로세스 수를 결정
+  - I/O bounded 와 compute-bounded를 잘 조절해서 선택해야 함
+- mid-term scheduling - memory allocation
+  - ready - suspended ready 간의 관계에서 어느 것을 우선적으로 memory에 할당할지를 결정하는 스케줄링 
+- short-term scheduling
+  - 프로세서를 할당할 process 결정
+- scheduling policy
+  - preemption / non-preemption scheduling
+    - preemption : 누가와서 내 것을 빼앗아 갈 수 있다는 의미
+    - non-preemption : 누가와서 빼앗아 갈 수 없음   
+- non-preemption scheduling
+  - context switching overhead가 적음
+  - 한 프로세스가 100시간 돌이가면, 다른 프로세스는 그동안 수행 못함
+- preemption scheduling
+  - context switching overhead가 큼
+  - time-sharing, real-time system에 적합
+- priority
+  - static priority
+    - 한번 우선순위가 고정되면 바뀌지 않음 
+  - dynamic priority 
+    - 언제든지 우선순위가 바뀔 수 있음 
 
 
 ## chapter07 교착상태(deadlock Resolution)

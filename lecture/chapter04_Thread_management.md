@@ -46,7 +46,7 @@ v               |
 - processor 활용의 기본 단위(process가 아니고 processor!)
 - 스레드 구성요소
   - thread ID
-  - Resister set(pc, sp 등)
+  - Register set(pc, sp 등)
   - Stack(ex) Local data)
 - 제어 요소 외에 코드, 데이터 및 자원들은 프로세스 내 다른 스레드들과 공유
 - 전통적인 프로세스 = 단일 프로세스
@@ -57,8 +57,8 @@ v               |
 ## thread의 장점
 - 자원공유(효율성 증가)
   - 만약 P1, P2라는 두 process가 자원 A를 공유하면 동시에 공유할 수 없으므로 context switch가 발생
-  - 만약 T1, T2라는 두 thread가 자원 A를 공유하면 context switch 없이 자원 공유 가능  
-    즉 커널의 개입을 막게되므로 overhead가 감소됨
+  - 만약 T1, T2라는 두 thread가 자원 A를 공유하면 공유하는 자원에 대해서는 context switching이 발생하지 않고, stack에 존재하는 자원만 context switching이 일어남. 즉 process에 비해 자원 공유가 드물게 일어남 
+ 
 - 경제성
   - process의 생성, context switch에 비해 효율적
 - Multi-processor(CPU)의 활용

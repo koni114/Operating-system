@@ -108,7 +108,7 @@
   - UI등 서비스 프로그램'
 
 ### 운영체제 구조 : 단일 구조
-![img](https://github.com/koni114/Operating-system/blob/master/img/os_2.jpg)
+![img](https://github.com/koni114/Operating-system/blob/master/img/os_2.JPG)
 
 - 커널에 단일로 모아둔 것
 - 예를들어 main 안에 모든 것들이 들어가 있는 것
