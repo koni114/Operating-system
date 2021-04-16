@@ -134,6 +134,7 @@
 ![img](https://github.com/koni114/Operating-system/blob/master/img/os_122.JPG)
 
 ## Directory Structure
+- Directoery 구조는 다음과 같이 생각해 볼 수 있음
 - Logical directory structure
   - Flast(single-level) directory structure
   - 2-level directory structure
@@ -160,6 +161,7 @@
   - Sub-directory 생성 불가능
     - File naming issue
   - 사용자간 파일 공유 불가     
+  - 보안에 대한 이슈도 존재. 디렉토리가 하나기 때문에 하나의 파일을 오픈하기 위해 내가 가지고 있는 모든 파일을 오픈 해야 함
 ![img](https://github.com/koni114/Operating-system/blob/master/img/os_124.JPG)
 
 ### Hierarchical Directory Structure
@@ -167,6 +169,7 @@
 - 사용자가 하부 directory 생성/관리 가능
   - System call이 제공되어야 함
   - Terminologies
+    - 계층적 directory가 등장하자 나온 용어들 
     - Home directory, Current directory
     - Absolute pathname, Relative pathname
   - 대부분의 OS가 사용  
@@ -179,6 +182,8 @@
 - Link의 개념 사용
 - ex) window에서 파일 바로가기는 특정 디렉토리의 파일을 가리킴
   - E.g., Unix system의 symbolic link
+  - 결과적으로 하위 디렉토리에서 상위 디렉토리로 link를 통해 이동할 수 있다는 개념
+  - 하지만 Acyclic 이므로, cycle을 형성할 수는 없음
 ![img](https://github.com/koni114/Operating-system/blob/master/img/os_126.JPG)
 - 위의 그림에서 하위 노드에서 특정 노드로 연결하여 갈 수 있다는 점이 있음
 - 중요한 것은 Acyclic Graph이기 때문에 cycle이 생성되지 않음
@@ -201,6 +206,7 @@
 ### File Protection Mechanism
 - 파일 보호 기법은 system size 및 응용 분야에 따라 다를 수 있음
 - Password 기법
+  - 파일을 확인히려면 Password를 입력 받게끔 하는 것 
   - 각 file들에 PW 부여
   - 비현실적
     - 사용자들이 파일 각각에 대한 PW를 기억해야 함
@@ -212,8 +218,10 @@
 - 범위(domain --> userGroup)와 개체(object--> file)사이의 접근 권한을 명시
 - Terminologies
   - Object
+    - <b>파일</b> 
     - 접근 대상(file, device 등 HW/SW objects)
   - Domain
+    - <b>사용자</b> 
     - 접근 권한의 집합
     - 같은 권한을 가지는 그룹(사용자, 프로세스)
   - Access right
@@ -272,7 +280,7 @@
 - Capability lists
   - List내 object들(localized Info.)에 대한 접근에 유리
   - Object별 권한 관리가 어려움  
-    만약 특정 object에 대해서 모든 domain에 대해서 read 권한을 부여해야 한다면 모든 list를 다 뒤져 봐야 함
+    만약 특정 object를 모든 domain에 대해서 read 권한을 부여해야 한다면 모든 domain을 전부 다 찾아서 취소 해야 함(overhead 발생)
 - 많은 OS가 Access list와 Capability list 개념을 함께 사용
   - Object에 대한 첫 접근 -> access list 탐색 
     - 접근 허용 시, Capability 생성 후 해당 프로세스에게 전달
@@ -302,24 +310,30 @@
 - 장점
   - 효율적인 file 접근(순차, 직접 접근)
 - 문제점
-  - 새로운 file을 위한 공간 확보가 어려움
+  - 새로운 file을 위한 공간 확보가 어려움  
+    ex) block 8칸 짜리에 10칸 짜리 파일을 넣어야 할 때 넣을 수 없음
   - External fragmentation
   - File 공간 크기 결정이 어려움
+    - 만약 처음 넣은 파일에 더 추가적인 data를 append 해야 한다면? 문제가 발생할 수 있음
+    - 결과적으로 최종 공간 크기의 결정이 어려움 
     - 파일이 커져야 하는 경우 고려해야 함    
 
 ### Linked Allocation
 - File이 저장된 block들을 linked list로 연결
+  - ex) FileA는 처음에 5번 block에 할당되고, 5번 block은 11을 가리키고 있으므로, 11번 block으로 이동... 
   - 비연속 할당 가능
 - Directory는 각 file에 대한 첫 번째 block에 대한 포인터를 가짐
 - Simple, No external fragmentation
 - 단점
-  - 직접 접근에 비효율적
+  - 순차 접근에는 큰 문제가 없지만, 직접 접근에 비효율적(direct에는 문제)
   - 포인터 저장을 위한 공간 필요
   - 신뢰성 문제 
     - 사용자가 포인터를 실수로 건드리는 문제 등    
+    - 중간에 끊어버리면 해당 데이터는 아예 사용이 불가함
 
 ### Linked Allocation: variation -> FAT
 - File Allocation Table(FAT)
+  - 실제 linked allocation 방식은 사용되고 있음! 
   - 각 block의 시작 부분에 다음 블록의 번호를 기록하는 방법
 - MS-DOS, Windows 등에 사용 됨    
 
@@ -328,13 +342,14 @@
 ### Indexed Allocation
 - File이 저장된 block의 정보(pointer)를 Index block에 모아 둠
 - 직접 접근에 효율적
-  - 순차 접근에는 비효율적
+  - 순차 접근에는 비효율적  
+    항상 index block에서 확인해서 다음으로 넘어가야 함
 - File당 Index block을 유지
   - Space overhead
   - Index block 크기에 따라 파일의 최대 크기가 제한됨
 - Unix 등에 사용됨    
 
-## Free Space management
+## 디스크 빈 공간 활용 방법(management)
 - Bit vector
 - Linked list
 - Grouping
@@ -344,15 +359,23 @@
 - 시스템 내 모든 block들에 대한 사용 여부를 1 bit flag로 표시
 - Simple and efficient
 - Bit vector 전체를 메모리에 보관해야 함
+  - 대형 시스템에 부적합. disk가 커질수록 bitmap 자체도 커져야 하기 때문
+![img](https://github.com/koni114/Operating-system/blob/master/img/os_130.JPG)
+
 
 ### Linked list
 - 빈 block을 linked list로 연결
-- 비효율적
+- link라는 공간도 필요하고, 탐색하려면 link를 따라가야 하므로, 비효율적
+![img](https://github.com/koni114/Operating-system/blob/master/img/os_131.JPG)
 
 ### Grouping
 - n개의 빈 block을 그룹으로 묶고, 그룹 단위로 linked list로 연결
+- Linkedlist보다 link를 여러번 타야하는 문제는 해결할 수 있음
 - 연속된 빈 block을 쉽게 찾을 수 있음
+![img](https://github.com/koni114/Operating-system/blob/master/img/os_132.JPG)
+
 
 ### Counting
 - 연속된 빈 block들 중 첫 번째 block의 주소와 연속된 block의 수를 table로 유지
 - Continuous allocation 시스템에 유리한 기법
+- 데이터가 어떤 형태로 짜여 있는가?에 따라서 적용 여부를 판단해야 함

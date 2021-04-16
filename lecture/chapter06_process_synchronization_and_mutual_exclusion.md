@@ -194,6 +194,7 @@ endwhile;
 flag[i] <- in-CS;
 j <- 0
 // in-CS라는 공간에서 나혼자만 존재할 경우 CS로 들어감.
+// j가 0부터 i까지 for loop를 돌면서, i가 아니거나, flag[j]의 값이 in-cs가 아니면 계속 진행
 while((j < n) and (j = i or flag[j] != in-CS)) do
   j <- j + 1;
 endwhile;
@@ -245,7 +246,7 @@ do // process P(i)의 진입 영역
     waiting[i] = true;
     key = true;
     while(waiting[i] && key)
-        key = TestAndSet(&lock);
+        key = TestAndSet(&lock); // lock이 false이면, cs내 진입 가능
     waiting[i] = false;
         // 임계 영역
         [Critical Section]
@@ -254,7 +255,7 @@ do // process P(i)의 진입 영역
     while((j != i) && !waiting[j]) // 대기 중인 프로세스를 찾음
         j = (j + 1) % n;
     if(j = i)                      // 대기 중인 프로세스가 없으면
-        lock = false;              // 다른 프로세스의 진입 허용
+        lock = false;              // cs open
     else                           // 대기 프로세스가 있으면 다음 순서로 임계 영역에 진입
         waiting[j] = false;        // Pj가 임계 영역에 진입할 수 있도록
 } while(true);

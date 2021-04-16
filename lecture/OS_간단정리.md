@@ -260,6 +260,96 @@
   - dynamic priority 
     - 언제든지 우선순위가 바뀔 수 있음 
 
+## chapter06 process synchronization and mutual exclusion
+- process synchronization(프로세스 동기화)
+  - 다중 프로그래밍 시스템
+    - 동시에 여러 프로세스 존재
+    - 프로세스가 독립적으로 동작하는데, 공유 자원이 존재할 때 문제 발생할 여지가 있음
+  - 프로세스 동기화
+    - 프로세스들이 서로 정보를 공유하는 것 
+- Asynchronous and concurrent P's
+  - 비동기적(Asynchronous) : 프로세스들이 서로에 대해서 모름
+  - 병행적(concurrent) : 여러 개의 프로세스들이 동시에 시스템에 존재
+  - 병행 수행 중인 비동기적 프로세스들이 공유 자원에 동시 접근할 때 문제 발생 여지 있음
+- Terminologies
+  - shared data : 여러 프로세스들이 공유하는 데이터
+  - critical section(cs) : 공유 데이터를 접근하는 코드 영역
+  - mutual exclusion -> 둘 이상의 process를 cs 진입을 막는 것   
+- machine instruction(기계어 명령 특성)
+  - 실제로 processor가 실행하는 가장 작은 실행 단위
+  - atomicity(원자성), indivisible(분리 불가능)의 특성을 가짐
+  - 한 기계어 명령의 실행 도중 인터럽트 받지 않음     
+- race condition
+  - 실행 방식에 따라서 결과가 달라지는 것 
+- <b>Mutual exclusion 수행시 요구사항</b>
+  - mutual exclusion(상호배제)
+    - cs에 프로세스가 있으면, 다른 프로세스의 진입 금지 
+  - progress(진행)
+    - cs안에 있는 프로세스 외에는 다른 프로세스가 cs 진입하는 것을 막아선 안됨 
+  - Bounded waiting(한정대기)   
+    - 프로세스의 cs 진입은 유한시간 내에 허용되어야 함 
+- Mutual Exclusion Solutions
+  - SW solutions
+    - Dekkers's algorithm
+    - Dijkstra's algorithm
+  - HW solutions
+    - TestAndSet(TAS) instruction --> process 3개 이상인 경우, bounded waiting 조건 위배
+  - OS supported SW solution
+    - Spinlock
+    - semaphore
+    - eventcount/sequencer
+  - Language-Level solution
+    - Monitor        
+- HW solutions - TAS instruction
+   - 아래 문장을 한 번에 수행(machine instruction) 
+~~~c
+boolean TestAndSet(boolean *target){
+  boolean temp = *target; // 이전 값 기록 
+  *target = true;         // target 변수 true
+  return temp;            // 이전 값 return
+}
+~~~ 
+- OS supported SW solution - Spinlock 
+  - 스레드나 프로세스가 lock을 소유하고 있다면, lock이 반환될 때까지 기다리는 것
+  - lock, unlock 과정이 짧은 경우에 유용
+  - 조금만 기다리면 바로 쓸 수 있는데 궂이 context switching을 해야 하나? 에서부터 출발
+  - P(), V() 연산을 통해 수행. P, V 연산은 OS에 의해 preemption 하다는 것을 보장
+  - Spinlock process는 동시에 두 process가 수행되어야 하므로, 멀티 프로세서 이상에서만 수행 가능
+~~~c
+P(S){
+  while(s <= 0) do
+  endwhile;
+  S <- S - 1
+}
+
+V(S){
+  S <- S + 1
+}
+~~~ 
+- OS supported SW solution - Semaphore
+  - 임의의 S 변수 하나에 ready queue 하나가 할당
+  - binary semaphore / counting semaphore
+~~~c
+P(S){
+  if(S > 0){
+    then S <- S - 1;
+    else wait on the queue Q(s); 
+  }
+}
+
+V(S){
+  if(waiting processes on Q(s)){
+    then wakeup one of them;
+    else S <- S + 1;
+  }
+}
+~~~
+- Semaphore로 해결할 수 있는 문제들
+  - ME problem
+  - process 동기화 문제
+  - 생산자-소비자 문제
+  - reader-writer 문제
+  - dining-philosopher 문제 
 
 ## chapter07 교착상태(deadlock Resolution)
 - 교착상태란 어떤 프로세스도 자원을 가져갈 수 없는 상태를 말함
